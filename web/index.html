@@ -1,0 +1,44 @@
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>DEMO</title>
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            background-color: #eee;
+        }
+        
+        main {
+            display: flex;
+        }
+        
+        #user-camera {
+            width: 120px;
+            height: 120px;
+        }
+    </style>
+    <script src="https://cdn.bootcdn.net/ajax/libs/fabric.js/4.3.0/fabric.min.js"></script>
+</head>
+
+<body>
+
+    <header>
+        <h4>DEMO</h4>
+    </header>
+    <main>
+        <canvas id="main-board"></canvas>
+        <div style="width:30%">
+            <video id="user-camera" autoplay playsinline></video>
+            <button id="start" disabled>生成</button>
+            <button id="save">保存</button>
+        </div>
+    </main>
+    <footer></footer>
+
+    <script src="index.js"></script>
+</body>
+
+</html>

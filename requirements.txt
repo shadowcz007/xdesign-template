@@ -1,0 +1,5 @@
+numpy
+opencv-python
+opencv-contrib-python
+sanic
+sanic-cors
