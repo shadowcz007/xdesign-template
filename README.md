@@ -8,3 +8,5 @@ cd xdesign-template
 python main.py
 ```
 
+## 
+- 支持动图
