@@ -1,6 +1,40 @@
 const _WIDHT = 560,
     _HEIGHT = 240;
 
+const templete = (PosterUrl, headTitle, secondTitle) => {
+    return [{
+        type: 'img',
+        data: {
+            url: PosterUrl,
+            left: 12,
+            top: 12,
+            scaleWidth: _HEIGHT - 24,
+            scaleHeight: _HEIGHT - 24
+        }
+    }, {
+        type: 'text',
+        data: {
+            text: headTitle,
+            left: _HEIGHT + 24,
+            top: 12,
+            fontSize: 32,
+            fontWeight: 800,
+            width: _WIDHT * 0.8,
+            fixedWidth: _WIDHT * 0.8,
+        }
+    }, {
+        type: 'text',
+        data: {
+            text: secondTitle,
+            left: _HEIGHT + 24,
+            top: 44,
+            fontSize: 23,
+            fontWeight: 800,
+            fixedWidth: 200,
+        }
+    }]
+};
+
 const mainBoard = document.getElementById('main-board');
 const startBtn = document.getElementById('start');
 const saveBtn = document.getElementById('save');
@@ -9,7 +43,12 @@ class Canvas {
     constructor(element) {
         element.width = window.innerWidth * 0.7;
         element.height = window.innerHeight;
+        this.element = element;
         this.canvas = new fabric.Canvas(element);
+        this.initMainBoard();
+
+    }
+    initMainBoard() {
         let rect = new fabric.Rect({
             width: _WIDHT,
             height: _HEIGHT,
@@ -31,7 +70,6 @@ class Canvas {
         this.canvas.discardActiveObject().renderAll();
 
         this.group = group;
-
     }
     addImg(imgElement, args = {}, width, height) {
         args = Object.assign(args, {
@@ -69,6 +107,36 @@ class Canvas {
         this.group.addWithUpdate(t);
         this.canvas.renderAll();
     }
+
+    createImg(url) {
+        return new Promise((resolve, reject) => {
+            let img = new Image();
+            img.src = url;
+            img.onload = () => resolve(img)
+        })
+    }
+
+    async draw(list = []) {
+        const drawImg = async(obj) => {
+            obj = {...obj };
+            let img = await this.createImg(obj.url);
+            this.addImg(img, obj, obj.scaleWidth, obj.scaleHeight);
+        };
+        const drawText = (obj) => {
+            obj = {...obj };
+            this.addText(obj.text, obj);
+        };
+
+        for (const t of list) {
+            if (t.type === 'img') {
+                await drawImg(t.data);
+            } else if (t.type === 'text') {
+                drawText(t.data);
+            }
+        };
+
+    }
+
     ungroup() {
         items = this.group._objects;
         items.reverse()
@@ -78,6 +146,62 @@ class Canvas {
             this.canvas.add(items[i]);
         }
         this.canvas.renderAll();
+    }
+
+    createGif(lists = []) {
+        this.gif = new GIF({
+            workers: 2,
+            workerScript: 'gif.worker.js',
+            quality: 8,
+            debug: true
+        });
+
+        this.frames = lists;
+        this.index = 0;
+        this.animate = true;
+        this.render();
+
+    }
+
+    getGif() {
+        this.gif.on('finished', function(blob) {
+            window.open(URL.createObjectURL(blob));
+        });
+
+        this.gif.render();
+    }
+
+    async render() {
+        // console.log(this.gif)
+        if (this.index >= this.frames.length) this.index = 0;
+        this.canvas.clear();
+        this.initMainBoard();
+        await this.draw(this.frames[this.index]);
+
+        if (this.gif.frames.length <= this.frames.length) {
+            let base64 = this.group.toDataURL({
+                format: 'png',
+                multiplier: 2,
+                width: _WIDHT
+            });
+            let im = await this.createImg(base64);
+            this.gif.addFrame(im, { copy: true, delay: 200 });
+
+        } else {
+            this.animate = false;
+            this.getGif();
+        }
+        this.index++;
+        if (this.animate === true) {
+            await this.sleep(200);
+            this.render();
+        }
+    }
+
+    async sleep(t) {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => resolve(), t)
+        })
     }
 
     // export () {
@@ -146,33 +270,11 @@ window.onload = () => {
         let res = await postData('/test', {
             base64
         });
+
         let url = 'data:image/png;base64,' + res.data;
-
-
-        let img = await createImg(url);
-
-        c.addImg(img, {
-            left: 12,
-            top: 12
-        }, _HEIGHT - 24, _HEIGHT - 24);
-
-        c.addText('TEXT', {
-            left: _HEIGHT + 24,
-            top: 12,
-            fontSize: 32,
-            fontWeight: 800,
-            width: _WIDHT * 0.8,
-            fixedWidth: _WIDHT * 0.8,
-        });
-
-        c.addText('2222222TEXT', {
-            left: _HEIGHT + 24,
-            top: 44,
-            fontSize: 23,
-            fontWeight: 800,
-            // width: _WIDHT * 0.8,
-            fixedWidth: 200,
-        });
+        // console.log(data);
+        // await c.draw(data);
+        c.createGif([templete(url, '标题1', '标题2'), templete(url, '标题2222', '标题444')])
 
     });
 
@@ -194,13 +296,7 @@ function getBase64FromVideo(video) {
     return base64
 }
 
-function createImg(url) {
-    return new Promise((resolve, reject) => {
-        let img = new Image();
-        img.src = url;
-        img.onload = () => resolve(img)
-    })
-}
+
 
 function postData(url, data) {
     // Default options are marked with *

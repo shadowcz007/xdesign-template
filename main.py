@@ -22,6 +22,11 @@ def handle_request(request):
 async def get_file(request):
   return await response.file("web/index.js")
 
+# js文件
+@app.route("/gif.worker.js")
+async def get_file2(request):
+  return await response.file("web/gif.worker.js")
+
 # API接口
 @app.route('/test', methods=['POST'])
 async def handle_test(request):
