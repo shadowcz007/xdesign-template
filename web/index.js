@@ -1,11 +1,11 @@
 const _WIDHT = 560,
     _HEIGHT = 240;
 
-const templete = (PosterUrl, headTitle, secondTitle) => {
+const templete = (posterUrl, headTitle, secondTitle) => {
     return [{
         type: 'img',
         data: {
-            url: PosterUrl,
+            url: posterUrl,
             left: 12,
             top: 12,
             scaleWidth: _HEIGHT - 24,
