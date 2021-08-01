@@ -4,14 +4,35 @@ function randomSelect(v) {
 }
 
 var input = document.querySelector('input');
+var targetId;
 
-console.log(input);
+
+
+new p5();
+
+function setup() {
+    createCanvas(500, 300);
+    textSize(34);
+}
+
+// clear();
+function draw() {
+    clear();
+    background('yellow');
+    if (targetId) text(targetId, 10, 50);
+}
+
+
+
+
+
+// console.log(input);
 input.addEventListener('change', function(e) {
 
-    var text = e.target.value;
+    var texts = e.target.value;
 
-    var id = randomSelect(text.split(' '));
-    console.log(id);
+    targetId = randomSelect(texts.split(' '));
+    console.log(targetId);
 
-    document.querySelector('#result').innerText = id;
+    // document.querySelector('#result').innerText = id;
 })
