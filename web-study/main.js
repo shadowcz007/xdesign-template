@@ -1,7 +1,17 @@
-var s = ['w1', 'a2', 'b9'];
+function randomSelect(v) {
+    var i = Math.round(Math.random() * (v.length - 1));
+    return v[i];
+}
 
-function random333333(_x) {
-    // f(x) 
-    var index = Math.round(Math.random() * (_x.length - 1));
-    return _x[index];
-};
+var input = document.querySelector('input');
+
+console.log(input);
+input.addEventListener('change', function(e) {
+
+    var text = e.target.value;
+
+    var id = randomSelect(text.split(' '));
+    console.log(id);
+
+    document.querySelector('#result').innerText = id;
+})
