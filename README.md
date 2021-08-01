@@ -9,7 +9,8 @@ python main.py
 ```
 
 ## 课程示例
-```web-study 简单的html、css、js完成随机抽签功能
+```
+web-study 简单的html、css、js完成随机抽签功能
 ```
 
 ## 
