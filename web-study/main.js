@@ -36,3 +36,12 @@ input.addEventListener('change', function(e) {
 
     // document.querySelector('#result').innerText = id;
 })
+
+
+
+class Person {
+    constructor() {
+
+    }
+
+}

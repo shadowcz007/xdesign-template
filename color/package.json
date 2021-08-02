@@ -1,0 +1,14 @@
+{
+  "name": "color",
+  "version": "1.0.0",
+  "description": "这是一个课程的示例，关于提取颜色",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "shadow",
+  "license": "MIT",
+  "dependencies": {
+    "colorthief": "^2.3.2"
+  }
+}

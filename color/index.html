@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./node_modules/colorthief/dist/color-thief.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+</head>
+
+<body>
+
+    <!-- <input type="file"> -->
+    <script>
+        var colorThief = new ColorThief();
+
+        /*var input = document.querySelector('input');
+        input.addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            console.log(file)
+            let img = new Image();
+            img.src = window.URL.createObjectURL(file);
+            if (img.complete) {
+                let colors = colorThief.getColor(img);
+                console.log(colors);
+            } else {
+                img.addEventListener('load', function() {
+                    let colors = colorThief.getColor(img);
+                    console.log(colors);
+                });
+            }
+
+            document.body.appendChild(img);
+        });*/
+
+
+        var canvas, img, mainColor;
+
+        function setup() {
+            canvas = createCanvas(windowWidth, windowHeight);
+            background("#eee");
+            noStroke();
+            fill('yellow');
+            rect(0, 120, windowWidth, windowHeight);
+
+            textSize(14);
+            textAlign(LEFT, TOP);
+            fill('black');
+            text('图片', 20, 25);
+            input = createFileInput(handleFile);
+            input.position(60, 20);
+
+            function handleFile(file) {
+                if (file.type === 'image') {
+                    img = createImg(file.data, '');
+                    console.log(img);
+                    img.hide();
+
+
+                    if (img.elt.complete) {
+                        var color = colorThief.getColor(img.elt);
+                        mainColor = `rgb(${color.join(',')})`;
+                    } else {
+                        img.elt.addEventListener('load', function() {
+
+                            var color = colorThief.getColor(img.elt);
+                            mainColor = `rgb(${color.join(',')})`;
+
+                        });
+                    }
+
+
+
+                } else {
+                    img = null;
+                }
+            }
+
+            text('字体', 20, 55);
+            input2 = createFileInput(handleFile2);
+            input2.position(60, 50);
+
+            function handleFile2(file) {
+                textFont(
+                    loadFont(URL.createObjectURL(file.file))
+                );
+            }
+
+            button = createButton('下载');
+            button.position(20, 90);
+            button.mousePressed(downCanvas);
+
+            function downCanvas() {
+                saveCanvas(canvas, '01', 'jpg');
+            }
+        }
+
+        function draw() {
+            clear();
+            if (img && mainColor) background(mainColor);
+            if (img) image(img, 0, 120, width, width * img.height / img.width);
+
+            textSize(24)
+            text("智能设计：标题", 10, height * 0.85)
+            textSize(14)
+            text("副标题", 12, height * 0.85 + 24)
+        }
+    </script>
+</body>
+
+</html>
