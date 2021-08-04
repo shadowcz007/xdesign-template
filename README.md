@@ -19,3 +19,8 @@ study/color 演示如何使用nodejs的web全栈项目
 
 ## 
 本地需开启 chrome://flags/#unsafely-treat-insecure-origin-as-secure
+填入 http://0.0.0.0:8888
+
+
+## 使用飞桨预训练模型
+https://www.paddlepaddle.org.cn/hubdetail?name=Extract_Line_Draft&en_category=ImageSegmentation

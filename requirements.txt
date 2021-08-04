@@ -3,3 +3,5 @@ opencv-python
 opencv-contrib-python
 sanic
 sanic-cors
+paddlepaddle
+paddlehub
