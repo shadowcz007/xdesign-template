@@ -3,7 +3,7 @@
 
 ## 如何运行
 ```
-git clone https://github.com/shadowcz007/xdesign-template
+git clone https://github.com/shadowcz007/xdesign-template.git
 cd xdesign-template
 python main.py
 ```
