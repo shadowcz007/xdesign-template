@@ -16,3 +16,6 @@ study/color 演示如何使用nodejs的web全栈项目
 
 ## 
 - 支持动图
+
+## 
+本地需开启 chrome://flags/#unsafely-treat-insecure-origin-as-secure
