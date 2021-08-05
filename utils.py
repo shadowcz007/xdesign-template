@@ -22,3 +22,26 @@ def gray2rgb(im):
 
 def bgr2gray(im):
     return cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
+
+
+
+from datetime import datetime
+import time
+# 每n秒执行一次
+def timer(n,fun):
+    while True:
+        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        time.sleep(n)
+        if fun!=None:
+            fun()
+
+from PIL import Image, ImageGrab
+
+# 读取剪切板图片
+def get_clipboard_image():
+    im = ImageGrab.grabclipboard()
+    if isinstance(im, Image.Image):
+        print(im.size, im.mode)
+
+# 5s
+timer(1,get_clipboard_image)
