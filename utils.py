@@ -44,4 +44,4 @@ def get_clipboard_image():
         print(im.size, im.mode)
 
 # 5s
-timer(1,get_clipboard_image)
+# timer(1,get_clipboard_image)
