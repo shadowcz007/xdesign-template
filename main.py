@@ -9,6 +9,13 @@ app = Sanic(name=__name__)
 CORS(app)
 
 
+#演示模型的调用
+import paddlehub as hub
+import cv2
+stylepro_artistic = hub.Module(name="stylepro_artistic")
+
+
+
 # 网页端
 @app.route('/')
 def handle_request(request):
@@ -36,11 +43,18 @@ async def handle_test(request):
     if json:
         im=utils.base64_to_cv2(json['base64'])
         
+        # im_gray=utils.bgr2gray(im)
+        # res=utils.cv2_to_base64(im_gray)
+
         # 使用算法处理im，返回结果
-        # print(im)
-        
-        im_gray=utils.bgr2gray(im)
-        res=utils.cv2_to_base64(im_gray)
+        result = stylepro_artistic.style_transfer(
+            images=[{
+                'content': im,
+                'styles': [cv2.imread('study/designAI/style.jpeg')]
+            }])
+        im=result[0]['data']
+        res=utils.cv2_to_base64(im)
+
     return response.json({
         'status':200,
         'data': res
