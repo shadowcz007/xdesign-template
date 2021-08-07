@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <input type="file">
+    <img src="result.png" style="max-width: 100px;">
+
+    <button>loadimage</button>
+    <script>
+        document.querySelector('input').addEventListener('change', e => {
+
+            //     console.log(e);
+
+            var file = e.target.files[0];
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                var base64 = event.target.result;
+                base64 = base64.replace(/data:image\/.*base64,/ig, '');
+                console.log(base64);
+            };
+
+
+        });
+
+        document.querySelector('button').addEventListener('click', e => {
+            loadImage();
+        });
+
+
+        function loadImage() {
+            var im = document.querySelector('img')
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+
+            canvas.width = im.naturalWidth;
+            canvas.height = im.naturalHeight;
+
+            ctx.drawImage(im, 0, 0);
+
+            var base64 = canvas.toDataURL();
+            base64 = base64.replace(/data:image\/.*base64,/ig, '');
+            console.log(base64)
+        };
+    </script>
+</body>
+
+</html>

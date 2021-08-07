@@ -11,6 +11,18 @@ CORS(app)
 async def handle_request(request):
     return await response.file("index.html")
 
+
+# 网页端
+@app.route('/base64')
+async def handle_request(request):
+    return await response.file("base64.html")
+
+
+@app.route('/result.png')
+async def handle_request(request):
+    return await response.file("result.png")
+
+
 # API接口
 @app.route('/add', methods=['POST'])
 async def handle_test(request):
