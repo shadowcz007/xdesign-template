@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .main {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .item {
+            min-width: 12px;
+            min-height: 12px;
+            background: #eee;
+            margin: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        img {
+            width: 100%;
+        }
+    </style>
+    <script src="./node_modules/yoga-layout-wasm/dist/asm.umd.js"></script>
+    <script src="./node_modules/smartcrop/smartcrop.js"></script>
+</head>
+
+<body>
+
+    <div class="main" style='display:none'>
+        <div class="item" style="flex:0.6;display: flex;">
+            <div class="item" style="flex:0.4;background:red">
+                <img src="2.png" alt="">
+            </div>
+            <div class="item" style="flex:0.6;background:red">
+                <img src="3.png" alt="">
+            </div>
+        </div>
+        <div class="item" style="flex:0.6">
+            <img src="4.png" alt="">
+        </div>
+        <div class="item" style="flex:0.2">
+            <img src="1.png" alt="">
+        </div>
+        <div class="item" style="flex:0.2">
+            <img src="1.jpeg" alt="">
+        </div>
+        <div class="item" style="flex:0.6">
+            <img src="2.jpeg" alt="">
+        </div>
+
+
+
+    </div>
+    <script>
+        //
+        var imgs = Array.from(document.images, async im => {
+
+            if (im.complete) {
+                //doImg(im);
+                let p = im.parentElement;
+                console.log(p)
+                let r = await smartcropForImg(im, im.parentElement.offsetWidth, im.parentElement.offsetHeight);
+                p.innerHTML = ''
+                p.appendChild(r);
+
+            } else {
+
+                im.onload = async() => {
+                    let p = im.parentElement;
+                    console.log(p)
+                    let r = await smartcropForImg(im, im.parentElement.offsetWidth, im.parentElement.offsetHeight);
+                    p.innerHTML = ''
+                    p.appendChild(r);
+                }
+            }
+            return im
+        });
+
+        function doImg(im) {
+            var pw = im.parentElement.offsetWidth,
+                ph = im.parentElement.offsetHeight,
+                imw = im.naturalWidth,
+                imh = im.naturalHeight;
+
+            //按照宽度缩放
+            var newW = ph * imw / imh;
+            //console.log('按宽度', newW, '父级的宽度', pw, newW / pw);
+
+            if (Math.abs(1 - (newW / pw)) < 0.15) {
+
+            } else {
+                //console.log(p, i);
+                im.style.height = '100%';
+                im.style.width = 'auto';
+            }
+
+        }
+
+        function smartcropForImg(im, width = 100, height = 200) {
+            return new Promise((resolve, reject) => {
+
+                smartcrop.crop(im, {
+                        width: width,
+                        height: height
+                    })
+                    .then(result => {
+                        console.log('裁切的参数', result);
+
+                        let canvas = document.createElement('canvas');
+                        let ctx = canvas.getContext('2d');
+                        canvas.width = width;
+                        canvas.height = height;
+
+                        ctx.drawImage(im,
+                            result.topCrop.x,
+                            result.topCrop.y,
+                            result.topCrop.width,
+                            result.topCrop.height,
+                            0,
+                            0,
+                            width,
+                            height)
+
+                        resolve(canvas);
+                    });
+
+
+            });
+
+        }
+
+        async function test() {
+            var width = 500,
+                height = 300;
+
+            //计算布局
+            const Node = Yoga.Node
+            const root = Node.create();
+
+            root.setWidth(width);
+            root.setHeight(height);
+            root.setJustifyContent(Yoga.JUSTIFY_CENTER);
+
+            const node1 = Node.create();
+            node1.setWidth(width);
+            node1.setFlex(0.2);
+            //node1.setHeight(100);
+
+            const node2 = Node.create();
+            node2.setWidth(width);
+            // node2.setHeight(100);
+            node2.setFlex(0.8);
+
+            root.insertChild(node1, 0);
+            root.insertChild(node2, 1);
+
+            root.calculateLayout(width, height, Yoga.DIRECTION_LTR);
+
+
+            console.log(root.getComputedLayout());
+            console.log(node1.getComputedLayout());
+            console.log(node2.getComputedLayout());
+
+            var node1Layout = node1.getComputedLayout();
+            var node2Layout = node2.getComputedLayout();
+
+            //自动裁切
+            var im1 = await createImage('1.jpeg');
+            var im2 = await createImage('2.jpeg');
+
+            im1 = await smartcropForImg(im1, node1Layout.width, node1Layout.height);
+            im2 = await smartcropForImg(im2, node2Layout.width, node2Layout.height);
+
+            //绘制到布局上
+            let canvas = document.createElement('canvas');
+            let ctx = canvas.getContext('2d');
+            canvas.width = width;
+            canvas.height = height;
+
+            ctx.drawImage(im1, 0, 0, node1Layout.width, node1Layout.height, node1Layout.left, node1Layout.top, node1Layout.width, node1Layout.height);
+            ctx.drawImage(im2, 0, 0, node2Layout.width, node2Layout.height, node2Layout.left, node2Layout.top, node2Layout.width, node2Layout.height);
+
+            document.body.appendChild(canvas)
+        };
+
+        Yoga.init().then(test);
+
+
+
+        function createImage(url) {
+            return new Promise((resolve, reject) => {
+                let _img = new Image();
+                _img.src = encodeURI(url);
+                // console.log(_img)
+                _img.onload = function() {
+                    resolve(_img);
+                }
+                _img.onerror = function() {
+                    resolve(null);
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>
