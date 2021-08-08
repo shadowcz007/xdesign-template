@@ -48,6 +48,8 @@ jspm_packages/
 # TypeScript v1 declaration files
 typings/
 
+study/hed/model
+
 # TypeScript cache
 *.tsbuildinfo
 

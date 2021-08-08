@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="p5.min.js"></script>
+</head>
+
+<body>
+    <img src="test.jpeg" alt="" style="width:300px">
+    <script>
+        //开启chrome的人脸识别新特性
+        //chrome://flags/
+        //开启Experimental Web Platform features
+
+        //练习人脸检测api
+        var faceDetector = new FaceDetector({
+            fastMode: false,
+            maxDetectedFaces: 10
+        });
+
+        var x, y, width, height;
+
+        var imgElment = document.querySelector('img');
+
+        if (imgElment.complete) {
+            faceDetector.detect(imgElment).then(rs => {
+                console.log(rs);
+                if (rs.length > 0) {
+                    x = rs[0].boundingBox.x;
+                    y = rs[0].boundingBox.y;
+                    width = rs[0].boundingBox.width;
+                    height = rs[0].boundingBox.height;
+                }
+
+            });
+        } else {
+            imgElment.onload = () => {
+                faceDetector.detect(imgElment).then(rs => {
+                    console.log(rs);
+                    if (rs.length > 0) {
+                        x = rs[0].boundingBox.x;
+                        y = rs[0].boundingBox.y;
+                        width = rs[0].boundingBox.width;
+                        height = rs[0].boundingBox.height;
+                    }
+
+                });
+            }
+
+        }
+
+
+
+        var img;
+        //p5.js
+        function setup() {
+
+            canvas = createCanvas(windowWidth, windowHeight * 0.4);
+
+            background("#eee");
+            noStroke();
+            fill('lightgray');
+            img = loadImage("test.jpeg");
+            //rect(12, 12, windowWidth*0.5, windowHeight);
+        }
+
+        function draw() {
+            var imgHeight = windowHeight * 0.4;
+            var scale = imgHeight / img.height;
+
+            image(img, 0, 0, img.width * scale, imgHeight);
+
+            if (x != undefined && y != undefined && width != undefined && height != undefined) {
+                noFill();
+                stroke('red');
+                rect(x * scale, y * scale, width * scale, height * scale);
+                //createNumRings(x * scale, y * scale)
+            }
+
+
+        }
+
+
+
+        // 文字环
+        function createNumRings(x, y) {
+            var amount = 3;
+            var spacing = 14;
+            var radius = 90;
+
+            for (var i = 0; i < amount; i++) {
+                createNumberRing(x, y, radius + spacing * i, 30 + 10 * i, i);
+            }
+        }
+
+
+        function createNumberRing(x, y, radius, amount, seed) {
+            randomSeed(seed);
+            var randomNumbers = [];
+            for (var i = 0; i <= amount; i++) {
+                randomNumbers.push(parseInt(random(2), 10));
+            }
+            var spacing = 360 / amount;
+
+            push();
+            translate(x, y);
+            var rotSpeed = 0.05;
+            rotate(frameCount * random(-rotSpeed, rotSpeed));
+
+            for (var i = 0; i < amount; i++) {
+                push();
+                rotate(i * spacing);
+                var num = new Num(randomNumbers[i], 0 + radius, 0, 90, random(50, 255));
+                num.render();
+                pop();
+            }
+
+            pop();
+        }
+
+        function Num(msg, x, y, rot, clr) {
+            this.x = x;
+            this.y = y;
+            this.rot = rot;
+            this.msg = msg;
+            this.color = clr;
+
+            this.render = function() {
+                push();
+                fill(this.color);
+                translate(this.x, this.y);
+                rotate(this.rot);
+                text(this.msg, 0, 0);
+                pop();
+            }
+        }
+
+        function randomOne(arr = []) {
+            let i = parseInt(Math.random() * arr.length);
+            return arr[i];
+        }
+    </script>
+    <!--<script>
+        var img, width = 400,
+            height = 300;
+
+        // imageProcess(document.querySelector('img'));
+
+
+        function loadImage(url) {
+            return new Promise((resolve, reject) => {
+                let _img = new Image();
+                _img.src = encodeURI(url);
+                // console.log(_img)
+                _img.className = 'opacity-background';
+                _img.onload = function() {
+                    resolve(_img);
+                }
+                _img.onerror = function() {
+                    resolve(null);
+                }
+            })
+        }
+
+        function imageProcess(im) {
+            if (!(im && im.src)) return
+            return new Promise(async(resolve, reject) => {
+                //console.log(im)
+                img = await loadImage(im.src);
+
+                // 人脸识别
+                img.faces = await getFace(im);
+
+                resolve(img);
+            })
+        };
+
+        function getFace(_im, fastMode = false, maxDetectedFaces = 10) {
+            var faceDetector = new FaceDetector({
+                fastMode: fastMode,
+                maxDetectedFaces: maxDetectedFaces
+            });
+            let facesRes = [];
+            return new Promise((resolve, reject) => {
+                faceDetector.detect(_im).then(function(faces) {
+                    console.log(`人脸检测`, faces)
+                    faces.forEach(function(item) {
+                        facesRes.push({
+                            x: parseInt(item.boundingBox.x),
+                            y: parseInt(item.boundingBox.y),
+                            width: parseInt(item.boundingBox.width),
+                            height: parseInt(item.boundingBox.height)
+                        });
+                    });
+                    resolve(facesRes)
+                }).catch(function(err) {
+                    console.log("err", err);
+                    reject(err);
+                });
+            });
+
+        }
+
+
+
+        // p5
+        /*
+
+        function setup() {
+
+            frameRate(20);
+
+            canvas = createCanvas(windowWidth, windowHeight * 0.4);
+
+            //colorMode(HSB, 1);
+
+            background("#eee");
+            noStroke();
+            fill('lightgray');
+            rect(12, 12, windowWidth - 24, windowHeight - 24);
+
+            textSize(14);
+            textAlign(LEFT, TOP);
+            fill('black');
+
+        }
+*/
+
+        function draw() {
+            //
+            clear();
+            if (img) {
+                //垂直居中
+                console.log(img.elt)
+                var h = img.height * width / img.width;
+                image(img, 0, h > height ? 0 : (height - h) / 2, width, h);
+            }
+            /*
+                        
+
+                        // if (!img.faces) imageProcess(img);
+                        // 当没有检测出脸的时候？
+                        if (img && img.faces && img.faces.length > 0) {
+                            noFill();
+
+                            var s = width / img.width;
+
+                            // 随机选取一张脸
+                            
+                            if (index == null) index = parseInt(Math.random() * img.faces.length);
+            let face = img.faces[index];
+            let x = (face.x + face.width / 2) * s;
+            // console.log(face);
+
+            circle(x, (face.y + face.height / 2) * s, face.height * s);
+            //createNumRings(x, (face.y + face.height / 2) * s);
+
+            // 文本
+            fill(img.randomColor);
+            textSize(24);
+            text(title, x < width / 2 ? width / 2 + 10 : 10, height * 0.75);
+            textSize(14);
+            text(secondTitle, x < width / 2 ? width / 2 + 12 : 12, height * 0.75 + 32);
+        } 
+        */
+        }
+
+
+
+
+    </script>-->
+
+</body>
+
+</html>
