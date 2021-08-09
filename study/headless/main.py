@@ -21,6 +21,14 @@ def download_img(img_url,file_path='test.png'):
         print("done")
     del r
 
+
+# img_urls=['x','x2']
+# index=0
+# for imurl in img_urls:
+#     download_img(imurl,str(index)+'.jpg')
+#     index+=1
+
+
 import numpy as np
 from mmcq import get_palette
 #提取颜色
